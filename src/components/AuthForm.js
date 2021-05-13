@@ -56,35 +56,38 @@ function validateEmail(email) {
 }
 
 
-export default function ({register}) {
+export default function AuthForm(props) {
 
+    // eslint-disable-next-line react/prop-types
+    const {register} = props;
     const email = Input('');
     const password = Input('');
     const history = useHistory();
 
 
+
     const sigIn = () => {
-        fetch('http://localhost:3001/login',{
+        fetch('http://localhost:3001/auth/login',{
             method:'POST',
             headers: { 'Content-Type': 'application/json' },
             mode: 'cors',
             body: JSON.stringify({ email: email.getValue(), password: password.getValue() })})
             .then(res => res.json())
             .then(data => {
-                console.log(data);
-                const { token } = data.payload;
-                if(token){
+                const { token , id} = data.payload;
+                if(data.payload){
                     history.push('/main');
                     const myStorage = window.sessionStorage;
                     myStorage.setItem('token',token)
-                }else{
-                    alert(data.error)
+                    console.log(data.payload)
+                    myStorage.setItem('userId',id)
+                    myStorage.setItem('user',data.payload.user);
                 }
             });
     }
 
     const signUp = () => {
-        fetch('http://localhost:3001/register',{
+        fetch('http://localhost:3001/auth/register',{
             method:'POST',
             headers: { 'Content-Type': 'application/json' },
             mode: 'cors',

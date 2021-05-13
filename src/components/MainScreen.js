@@ -1,5 +1,4 @@
 import React, {useState} from "react";
-import {useHistory} from "react-router";
 import ProfilePage from "./MainPages/ProfilePage";
 import DialogsPage from "./MainPages/DialogsPage";
 import FriendsPage from "./MainPages/FriendsPage";
@@ -7,31 +6,39 @@ import GroupsPage from "./MainPages/GroupsPage";
 
 const styles = {
     mainPageWrapper: {
-        display: 'flex',
-        width:'100%'
+        width: '100%',
+        margin: '0 auto',
+        backgroundColor: '#CDA390'
     },
     navigator: {
-        backgroundColor: '#C4C4C4',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        padding: '15px'
     },
     contentList: {
-        backgroundColor: '#8D8D8D',
-        display: 'flex',
-        flex:'10'
+        display: 'block',
+        minHeight: '90%'
     },
     button: {
-        backgroundColor: '#C4C4C4',
+        margin: '1em',
+        backgroundColor: '#AAACCC',
         borderWidth: '0px',
-        fontSize: '28px'
+        borderRadius: '15px',
+        padding: '0.3em',
+        paddingRight: '0.5em',
+        paddingLeft: '0.5em',
+        fontSize: '1.3em',
+        color: '#36424e'
     },
     buttonHighlighted: {
-        backgroundColor: '#FFFFFF',
         borderWidth: '0px',
-        fontSize: '28px',
-        borderRadius: '25px'
+        margin: '1em',
+        borderRadius: '15px',
+        outline: 'none',
+        padding: '0.3em',
+        paddingRight: '0.5em',
+        paddingLeft: '0.5em',
+        fontSize: '1.3em',
+        color: '#36424e',
+        backgroundColor: '#e2d7df',
+
     }
 }
 class MenuOption {
@@ -53,25 +60,33 @@ const Drawer = ({setSelected, buttonsLabels, selected}) => {
         <div style={styles.navigator}>
             {buttonsLabels.map((item) => {
                 if(item.route === selected){
-                    return <button {...addOnPressToButton(item)} style={styles.buttonHighlighted}>{item.name}</button>
+                    return <button key={item.name} {...addOnPressToButton(item)} style={styles.buttonHighlighted}>{item.name}</button>
                 }else{
-                    return <button {...addOnPressToButton(item)} style={styles.button}>{item.name}</button>
+                    return <button key={item.name} {...addOnPressToButton(item)} style={styles.button}>{item.name}</button>
                 }
             })}
         </div>
     )
 }
 
-export default function (props) {
+export default function MainScreen() {
+
+    const [selected, setSelected] = useState('/profile');
 
     const buttonsLabels = [
-        new MenuOption('Профиль','/profile',ProfilePage()),
-        new MenuOption('Диалоги','/dialogs',DialogsPage()),
-        new MenuOption('Друзья','/friends',FriendsPage()),
-        new MenuOption('Группы','/groups',GroupsPage()),
+        new MenuOption('Профиль','/profile',<ProfilePage/>),
+        new MenuOption('Диалоги','/dialogs',<DialogsPage setSelected={setSelected}/>),
+        new MenuOption('Друзья','/friends',<FriendsPage
+            setSelected={() => {
+                setSelectedComponent(buttonsLabels[1].component)
+                setSelected('/dialogs')
+            }}/>),
+        new MenuOption('Группы','/groups',<GroupsPage/>),
     ];
-    const [selected, setSelected] = useState('/profile');
+
     const [selectedComponent, setSelectedComponent] = useState(buttonsLabels[0].component);
+
+
 
     return (<div style={styles.mainPageWrapper}>
       <Drawer setSelected={(item) => {
