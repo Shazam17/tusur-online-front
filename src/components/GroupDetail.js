@@ -62,7 +62,7 @@ export default function GroupDetail(props) {
         fetchRequest(`groups/group?id=${groupId}`,'GET').then((r) => {
             setGroupInfo(r.data);
         });
-        fetchRequest(`posts/posts-group-get?id=${groupId}`,'GET').then((r) => {
+        fetchRequest(`posts/posts-get?id=${groupId}&isGroup=true`,'GET').then((r) => {
             setPosts(r.data);
         });
     }, [])
@@ -74,7 +74,8 @@ export default function GroupDetail(props) {
                 flexDirection: 'column',
                 alignItems: 'center',
                 marginRight: '2em',
-                marginBottom: '2em'
+                marginBottom: '2em',
+                width: '60%'
             }}>
                 <h1>Группа {groupInfo.title}</h1>
                 <CreatePost groupId={groupId}/>

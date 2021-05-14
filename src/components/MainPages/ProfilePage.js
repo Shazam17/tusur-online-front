@@ -1,27 +1,104 @@
-import React, {Component} from "react";
+import React, {Component, useEffect, useState} from "react";
 import fetchRequest from "./fetchRequest";
 import {MAIN_STYLES} from "../../constants";
 const kit = "https://wuzzup.ru/wp-content/uploads/2019/05/43054392_2250627378549261_137207783997206054_n.jpg"
 import Modal from 'react-modal';
 import ImageViewer from 'react-simple-image-viewer';
+import SocketWrapper from "../../socketWrapper";
 
 
-export function Post(props) {
+export function CreateComment(props) {
 
-    const {post} = props;
+    const [text, setText] = useState("")
 
-    return (<div style={{...MAIN_STYLES.highlightedText,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        justifyContent: 'center',
-        width: '90%',
-        padding: '1em',
-        paddingTop: '0em'
+
+    return (
+        <div style={{display:'flex', marginLeft: '1em',backgroundColor: '#bab73d', padding: '0.5em', borderRadius: '50px', alignItems: 'center'}}>
+            <input style={MAIN_STYLES.textInput} placeholder={"оставьте комментарий"} value={text}
+                   onChange={(e) => setText(e.target.value)}/>
+            <img src={"60525.svg"}
+                 style={{width:'1em', height: '1em', marginLeft: '1em',backgroundColor: "#e2e0d3", borderRadius: '50px', padding: '0.2em'}}
+                 onClick={() => {
+                    console.log(text)
+                     const user =  sessionStorage.getItem('userId');
+                     SocketWrapper.GetSocket().emit("comment_create", {
+                         id:user,
+                         post_id:props.postId,
+                         text
+                     })
+                        setText("")
+
+                     // fetchRequest(`comments/create`, 'POST',{owner_id:user, post_id:props.postId,text}).then((res) => {
+                     //    setText("")
+                     // })
+            }}/>
+        </div>
+    );
+}
+
+
+export class Post extends Component{
+
+
+    state = {
+        comments: []
+    }
+
+    componentDidMount(){
+        const {post} = this.props;
+
+        fetchRequest(`comments?id=${post.id}`, 'GET').then((res) => {
+            this.setState({comments: res.data})
+        })
+        SocketWrapper.GetInstance().addListener("new_comment", (ev) => {
+            console.log(ev)
+            if(ev.post_id === post.id){
+                this.setState({comments: [...this.state.comments, ev]})
+            }
+        })
+    }
+
+    render(){
+        return (<div style={{...MAIN_STYLES.highlightedText,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            justifyContent: 'center',
+            width: '90%',
+            padding: '1em',
+            paddingTop: '0em',
+            backgroundColor: '#89a9ae'
         }}>
-        <div style={{  display: 'flex', alignItems: 'center'}}><img style={{width: '2em', height: '2em', borderRadius: '1em', marginRight: '1em'}} src={kit}/><p style={{fontSize: '2em'}}>{post.title}</p></div>
-        <div style={{textAlign:'left', width: '100%', textOverflow: 'ellipsis',wordBreak: 'break-all' }}>{post.content}</div>
-    </div>)
+            <div style={{  display: 'flex',
+                alignItems: 'center'}}><img style={{width: '2em',
+                height: '2em',
+                borderRadius: '1em',
+                marginRight: '1em'}} src={kit}/>
+                <p style={{fontSize: '2em'}}>{this.props.post.title}</p>
+            </div>
+            <div style={{textAlign:'left',
+                width: '100%',
+                textOverflow: 'ellipsis',
+                wordBreak: 'break-all',
+                marginBottom: '1em',
+                marginLeft: '1em',
+                marginRight: '1em'}}>{this.props.post.content}</div>
+            <div>{this.state.comments.map(item => <div style={{...MAIN_STYLES.highlightedText,
+                padding: '0.5em',
+                borderRadius: '1.5em',
+                fontSize: '1em',
+                display:'flex',
+                alignItems:'center'}}>
+                <img style={{
+                    width:'2em',
+                    height: '2em',
+                    borderRadius:'1em',
+                    margin:'10px'}} src={item.owner.avatar_url}/>
+                {item.text}
+            </div>)}</div>
+            <CreateComment postId={this.props.post.id}/>
+        </div>)
+    }
 }
 
 
@@ -42,11 +119,9 @@ export default class ProfilePage extends Component {
     componentDidMount(){
             const user =  sessionStorage.getItem('userId');
             fetchRequest(`posts/posts-get?id=${user}`,'GET').then((res) => {
-                console.log(res.data)
                 this.setState({...this.state,posts: res.data, isOpen: false});
             })
         fetchRequest(`stories/get?id=${user}`,'GET').then((res) => {
-            console.log(res.data)
             this.setStories(res.data)
         })
 
@@ -54,7 +129,11 @@ export default class ProfilePage extends Component {
             this.setState({...this.state,userInfo: res.data})
         })
 
-
+        SocketWrapper.GetInstance().addListener("new_post", (ev) => {
+            if(ev.owner_id.toString() === user){
+                this.setState({...this.state, posts: [ev, ...this.state.posts]})
+            }
+        })
     }
 
     setTitle(ev){
@@ -80,11 +159,13 @@ export default class ProfilePage extends Component {
 
     createPost(){
         const user =  sessionStorage.getItem('userId');
-        fetchRequest("posts/create", 'POST', {title: this.state.title,content: this.state.content, id:user, isGroup: false })
-            .then((res) => {
-            console.log(res)
+        SocketWrapper.GetSocket().emit("post_create", {
+            title:this.state.title,
+            content: this.state.content,
+            id:user,
+            isGroup: false
         })
-        this.setState({...this.state, title: "", content: ""})
+        this.setState({...this.state, title: "", content: "",isOpen: false, })
     }
 
     createStory(){
@@ -92,7 +173,6 @@ export default class ProfilePage extends Component {
         let url = prompt("Введите ссылку на картинку");
         fetchRequest("stories/create", 'POST', {url, id:user })
             .then((res) => {
-                console.log(res)
                 this.setStories([...this.state.stories, res.data])
             })
     }
@@ -109,7 +189,6 @@ export default class ProfilePage extends Component {
                     this.createStory()
                 }}/>
             {this.state.stories.slice(0,this.state.renderAllStories).map((item, index) => (<img onClick={() => {
-                console.log('click')
                 this.setState({...this.state, storyIndex:index,imageViewerState: true })
             }} style={MAIN_STYLES.story} src={item.photo}/>))}
         </div>)

@@ -66,7 +66,10 @@ export default function FriendsPage(props) {
             </div>
             <div style={MAIN_STYLES.offsetBlock}>
                 <h1>Друзья</h1>
-                <div style={{display: 'flex'}}>
+                <div style={{display: 'grid',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gridColumnGap: '5px',
+                    gridRowGap: '5px'}}>
                     {friends.map(item => {
                         return (
                             <div key={item.id} style={MAIN_STYLES.friendAvatar}>

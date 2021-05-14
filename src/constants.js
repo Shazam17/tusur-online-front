@@ -33,7 +33,8 @@ export const MAIN_STYLES = {
         flexDirection: 'column',
         padding: '1em',
         boxShadow,
-        flex: '1'
+        flex: '1',
+        borderRadius: '50px'
     },
     offsetBlockHorizontal: {
         marginLeft: '2em',
@@ -43,7 +44,9 @@ export const MAIN_STYLES = {
         padding: '1em',
         boxShadow,
         flex: '1',
-        height: '90%'
+        height: '90%',
+        borderRadius: '50px'
+
     },
 
     offsetBlockRounded: {

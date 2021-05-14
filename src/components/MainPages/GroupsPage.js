@@ -92,7 +92,6 @@ export default function (props) {
         setTimeout(() => {
             setSelected(id)
         }, 100)
-        // history.push('/group-detail',{id});
     }
     const CreateGroupButton = () => ( <div style={{display:'block'}}><button style={MAIN_STYLES.button} onClick={onCreateGroupClick}>Создать группу</button></div>);
     return (
@@ -105,7 +104,10 @@ export default function (props) {
             </div>
             <div style={MAIN_STYLES.offsetBlock}>
                 <div><CreateGroupButton/><h1>Группы</h1></div>
-                <div style={{ display: 'flex',}}>
+                <div style={{ display: 'grid',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gridColumnGap: '5px',
+                    gridRowGap: '5px',marginRight: '2em'}}>
                     {groups.map((item) => {
                         return <div style={MAIN_STYLES.friendAvatar}
                                     key={item.id}
