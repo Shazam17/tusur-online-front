@@ -1,6 +1,6 @@
 
 
-const CURRENT_URL = 'http://localhost:3004/';
+const CURRENT_URL = 'https://tusur-online-back.herokuapp.com/';
 
 export default async (url, method = 'POST',body = {}) => {
     let internalBody = {};
