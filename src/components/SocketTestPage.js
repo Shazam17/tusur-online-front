@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {io} from "socket.io-client";
-const socket = io('http://localhost:3002');
+const socket = io('http://localhost:3004');
 
 
 export default function SocketTestPage() {

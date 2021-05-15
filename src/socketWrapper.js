@@ -5,7 +5,7 @@ export default class SocketWrapper {
 
 
     constructor() {
-        this.socket = io('http://localhost:3002');
+        this.socket = io('http://localhost:3004');
         this.listnener = new Map();
 
 

@@ -1,0 +1,39 @@
+version: '3.7'
+
+services:
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: admin
+      POSTGRES_DB: tusur_new
+
+
+  backend:
+    container_name: back
+    image: back
+    ports:
+      - 3004:3004
+    environment:
+      - DB_HOST=db
+    links:
+      - db
+
+  frontend:
+    container_name: front
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - '.:/app'
+      - '/app/node_modules'
+    ports:
+      - 3003:3000
+    links:
+      - backend
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - BACK_HOST=backend

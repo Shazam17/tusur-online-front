@@ -67,7 +67,7 @@ export default function AuthForm(props) {
 
 
     const sigIn = () => {
-        fetch('http://localhost:3001/auth/login',{
+        fetch('http://localhost:3004/auth/login',{
             method:'POST',
             headers: { 'Content-Type': 'application/json' },
             mode: 'cors',
@@ -75,7 +75,7 @@ export default function AuthForm(props) {
             .then(res => res.json())
             .then(data => {
                 const { token , id} = data.payload;
-                if(data.payload){
+                if(data.payload.user){
                     history.push('/main');
                     const myStorage = window.sessionStorage;
                     myStorage.setItem('token',token)
@@ -87,7 +87,7 @@ export default function AuthForm(props) {
     }
 
     const signUp = () => {
-        fetch('http://localhost:3001/auth/register',{
+        fetch('http://localhost:3004/auth/register',{
             method:'POST',
             headers: { 'Content-Type': 'application/json' },
             mode: 'cors',

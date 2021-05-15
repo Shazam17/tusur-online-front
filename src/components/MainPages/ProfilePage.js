@@ -27,10 +27,6 @@ export function CreateComment(props) {
                          text
                      })
                         setText("")
-
-                     // fetchRequest(`comments/create`, 'POST',{owner_id:user, post_id:props.postId,text}).then((res) => {
-                     //    setText("")
-                     // })
             }}/>
         </div>
     );
@@ -130,7 +126,7 @@ export default class ProfilePage extends Component {
         })
 
         SocketWrapper.GetInstance().addListener("new_post", (ev) => {
-            if(ev.owner_id.toString() === user){
+            if(ev.user_id.toString() === user){
                 this.setState({...this.state, posts: [ev, ...this.state.posts]})
             }
         })

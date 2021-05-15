@@ -81,7 +81,11 @@ class Chat extends Component {
                                     display: 'flex',
                                     alignSelf: parseInt(this.state.userId) === item.owner_id ? 'flex-end' : 'flex-start'
                                 }}>
-                                    <div style={MAIN_STYLES.button}>{item.text}</div>
+                                    {item.attachment ?
+                                        <div style={MAIN_STYLES.button}><a href={item.attachment} >{item.attachment}</a></div> :
+                                        <div style={MAIN_STYLES.button}>{item.text}</div>
+                                    }
+
                                 </div>
                             }
                         )
@@ -125,6 +129,32 @@ class Chat extends Component {
                         <img style={{
                             width: '25p',
                             height: '25px',}} src={"60525.svg"}/>
+                    </div>
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            width: '50px',
+                            height: '50px',
+                            borderRadius: '25px',
+                            backgroundColor: '#c3c5d7',
+                            marginLeft: '1em'
+                        }}
+                        onClick={() => {
+                            const userId = sessionStorage.getItem('userId');
+                            this.setState({...this.state,text: ""})
+                            const attachment = prompt("введите ссылку на вложение")
+                            SocketWrapper.GetSocket().emit("send_message", {
+                                text: this.state.text,
+                                id: userId,
+                                chat_id: this.props.dialogId,
+                                attachment
+                            })
+                        }}>
+                        <img style={{
+                            width: '30px',
+                            height: '30px',}} src={"iconfinder_multimedia-47_2849789.svg"}/>
                     </div>
                 </div>
             </div>
